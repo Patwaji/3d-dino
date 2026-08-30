@@ -6,6 +6,7 @@ import { cloneModel, findClip, loadAssets, loadFoliage } from './assets.js'
 import { createForest } from './forest.js'
 import { BIOMES, FOLIAGE } from './biomes.js'
 import { pickBiome, showLoading } from './menu.js'
+import { createInput } from './input.js'
 
 const canvas = document.querySelector('#game')
 const { scene, renderer, resize, setGround } = createScene(canvas)
@@ -14,6 +15,7 @@ const rig = createCameraRig(window.innerWidth, window.innerHeight)
 const camera = rig.camera
 resize(window.innerWidth, window.innerHeight)
 
+const input = createInput()
 const mixers = []
 let forest = null
 
@@ -51,6 +53,7 @@ function frame(timestamp) {
   for (const mixer of mixers) mixer.update(delta)
   if (forest) forest.update(delta, 6)
   renderer.render(scene, camera)
+  input.consume()
   requestAnimationFrame(frame)
 }
 
