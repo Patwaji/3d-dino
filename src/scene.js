@@ -36,9 +36,7 @@ export function createScene(canvas) {
   ground.receiveShadow = true
   scene.add(ground)
 
-  function resize(width, height, camera) {
-    camera.aspect = width / height
-    camera.updateProjectionMatrix()
+  function resize(width, height) {
     renderer.setSize(width, height)
   }
 
