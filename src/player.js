@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { cloneModel, findClip } from './assets.js'
-import { FAST_FALL, GRAVITY, JUMP_CUT, JUMP_VELOCITY } from './config.js'
+import { FALL_GRAVITY, FAST_FALL, GRAVITY, JUMP_VELOCITY, RELEASE_GRAVITY } from './config.js'
 
 const RUN_BOX = { width: 0.9, height: 1.6 }
 const DUCK_BOX = { width: 1.3, height: 0.9 }
@@ -54,8 +54,10 @@ export function createPlayer(model, animations) {
     }
 
     if (state === 'jumping') {
-      if (!input.jumpHeld && velocityY > 0) velocityY *= JUMP_CUT
-      velocityY -= GRAVITY * delta
+      let gravity = GRAVITY
+      if (velocityY > 0 && !input.jumpHeld) gravity *= RELEASE_GRAVITY
+      if (velocityY <= 0) gravity *= FALL_GRAVITY
+      velocityY -= gravity * delta
       if (input.duckHeld) velocityY -= FAST_FALL * delta
       object.position.y += velocityY * delta
 
