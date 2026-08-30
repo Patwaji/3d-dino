@@ -1,0 +1,17 @@
+export const SPEED_START = 6
+export const SPEED_MAX = 13
+export const SPEED_ACCEL = 0.05
+export const GRAVITY = 35
+export const JUMP_VELOCITY = 11
+export const JUMP_CUT = 0.45
+export const FAST_FALL = 55
+export const MAX_DELTA = 0.05
+export const SPAWN_X = 60
+export const DESPAWN_X = -20
+export const GAP_MIN_SECONDS = 0.9
+export const GAP_MAX_SECONDS = 1.9
+export const SCORE_PER_UNIT = 1.5
+export const BIRD_SCORE = 450
+export const NIGHT_INTERVAL = 700
+export const SEGMENT_LENGTH = 20
+export const SEGMENT_COUNT = 5
