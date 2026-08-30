@@ -43,6 +43,32 @@ describe('overlaps', () => {
   })
 })
 
+const bird = (y) => box(0, y, 1.2, 0.9)
+
+describe('bird lanes', () => {
+  it('hits the low bird when running', () => {
+    expect(overlaps(runningDino(), bird(0.7))).toBe(true)
+  })
+
+  it('clears the low bird with a jump', () => {
+    expect(overlaps(runningDino(1.7), bird(0.7))).toBe(false)
+  })
+
+  it('hits the mid bird when running', () => {
+    expect(overlaps(runningDino(), bird(1.6))).toBe(true)
+  })
+
+  it('passes under the mid bird when ducking', () => {
+    expect(overlaps(duckingDino(), bird(1.6))).toBe(false)
+  })
+
+  it('never hits the high bird, even at full jump height', () => {
+    for (let y = 0; y <= 1.95; y += 0.05) {
+      expect(overlaps(runningDino(y), bird(4.3))).toBe(false)
+    }
+  })
+})
+
 describe('hitAny', () => {
   it('returns false with nothing on screen', () => {
     expect(hitAny(runningDino(), [])).toBe(false)
