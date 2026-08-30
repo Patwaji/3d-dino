@@ -31,6 +31,16 @@ function run(obstacles, score, seconds = 120) {
 }
 
 describe('createObstacles', () => {
+  it('keeps a bird hitbox steady while the model bobs', () => {
+    const obstacles = makeObstacles({ withBird: true })
+    run(obstacles, BIRD_SCORE + 500, 20)
+    const birds = obstacles.boxes().filter((b) => b.height === 0.9)
+    for (const bird of birds) {
+      const lane = [0.7, 1.6, 4.3].map((y) => y + 0.45)
+      expect(lane.some((y) => Math.abs(bird.y - y) < 0.001)).toBe(true)
+    }
+  })
+
   it('survives scores past the bird threshold without a bird model', () => {
     const obstacles = makeObstacles({ withBird: false })
     expect(() => run(obstacles, BIRD_SCORE + 500)).not.toThrow()

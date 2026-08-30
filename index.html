@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D Dino</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%A6%96</text></svg>" />
     <style>
       html, body { margin: 0; height: 100%; overflow: hidden; background: #f7f7f7; }
       canvas { display: block; }
@@ -22,7 +23,8 @@
       }
       body[data-night] #hud { color: #dfe3d4; }
       #hud[hidden] { display: none; }
-      #high { opacity: .42; }
+      #high, #muted { opacity: .42; }
+      #muted[hidden] { display: none; }
       #gameover {
         position: fixed; inset: 0; display: flex; flex-direction: column;
         align-items: center; justify-content: center; gap: 14px;
@@ -58,6 +60,7 @@
     <div id="loading"><p>loading</p></div>
     <div id="hud" hidden>
       <span id="high"></span>
+      <span id="muted" hidden>muted</span>
       <span id="score">00000</span>
     </div>
     <div id="gameover" hidden>

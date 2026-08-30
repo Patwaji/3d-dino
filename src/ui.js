@@ -14,8 +14,13 @@ export function createUI() {
     else delete document.body.dataset.night
   }
 
+  function setMuted(muted) {
+    document.querySelector('#muted').hidden = !muted
+  }
+
   return {
     setScore,
+    setMuted,
     setNight,
     show: () => { hud.hidden = false },
     showGameOver: () => { gameOverEl.hidden = false },

@@ -2,6 +2,9 @@ import { DESPAWN_X, SPAWN_X, SPEED_START } from './config.js'
 import { SHAPES, clusterOffsets, nextGap, pickObstacle } from './spawn.js'
 
 const FIRST_X = 18
+const BIRD_BOB = 0.22
+const BIRD_BOB_SPEED = 4.2
+const BIRD_ROLL = 0.14
 
 export function createObstacles(scene, assets) {
   const models = {
@@ -13,6 +16,7 @@ export function createObstacles(scene, assets) {
   const pools = { small: [], large: [], bird: [] }
   const active = []
   let distanceToNext = 0
+  let elapsed = 0
 
   function take(size) {
     const pooled = pools[size].pop()
@@ -29,7 +33,9 @@ export function createObstacles(scene, assets) {
   function place(size, x, y) {
     const item = take(size)
     item.object.position.set(x, y, 0)
-    item.object.rotation.y = Math.random() * Math.PI * 2
+    item.object.rotation.y = size === 'bird' ? Math.PI : Math.random() * Math.PI * 2
+    item.baseY = y
+    item.phase = Math.random() * Math.PI * 2
     active.push(item)
     return item
   }
@@ -64,9 +70,18 @@ export function createObstacles(scene, assets) {
       distanceToNext = nextGap(speed, Math.random)
     }
 
+    elapsed += delta
+
     for (let i = active.length - 1; i >= 0; i -= 1) {
       const item = active[i]
       item.object.position.x -= travelled
+
+      if (item.size === 'bird') {
+        const wave = elapsed * BIRD_BOB_SPEED + item.phase
+        item.object.position.y = item.baseY + Math.sin(wave) * BIRD_BOB
+        item.object.rotation.z = Math.sin(wave) * BIRD_ROLL
+      }
+
       if (item.object.position.x < DESPAWN_X) {
         item.object.visible = false
         active.splice(i, 1)
@@ -80,7 +95,7 @@ export function createObstacles(scene, assets) {
       const shape = SHAPES[item.size]
       return {
         x: item.object.position.x,
-        y: item.object.position.y + shape.height / 2,
+        y: (item.size === 'bird' ? item.baseY : item.object.position.y) + shape.height / 2,
         width: shape.width,
         height: shape.height
       }

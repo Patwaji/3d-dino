@@ -12,6 +12,13 @@ import { createObstacles } from './obstacles.js'
 import { createGame } from './game.js'
 import { createScore } from './score.js'
 import { createUI } from './ui.js'
+import { createAudio } from './audio.js'
+
+const probe = document.createElement('canvas')
+if (!probe.getContext('webgl2') && !probe.getContext('webgl')) {
+  document.body.innerHTML = '<p style="font:500 14px/1.6 ui-monospace,monospace;padding:48px;color:#3f3b2e;letter-spacing:.1em">this game needs WebGL, which this browser does not support</p>'
+  throw new Error('no webgl')
+}
 
 const canvas = document.querySelector('#game')
 const { scene, renderer, resize, setGround, setNight, updateSky } = createScene(canvas)
@@ -23,6 +30,7 @@ resize(window.innerWidth, window.innerHeight)
 const input = createInput()
 const ui = createUI()
 const score = createScore(window.localStorage)
+const audio = createAudio()
 let game = null
 
 async function boot() {
@@ -39,10 +47,14 @@ async function boot() {
 
   ui.show()
   ui.setScore(0, score.high)
-  game = createGame({ player, obstacles, forest, rig, input, score, ui, sky: { setNight } })
+  game = createGame({ player, obstacles, forest, rig, input, score, ui, sky: { setNight }, audio })
 }
 
 boot()
+
+window.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyM') ui.setMuted(audio.toggleMute())
+})
 
 window.addEventListener('resize', () => {
   rig.resize(window.innerWidth, window.innerHeight)
