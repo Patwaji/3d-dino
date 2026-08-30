@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { MAX_DELTA, SPEED_START } from './config.js'
+import { MAX_DELTA } from './config.js'
 import { createCameraRig } from './camera.js'
 import { createScene } from './scene.js'
 import { loadAssets, loadFoliage } from './assets.js'
@@ -9,6 +9,7 @@ import { pickBiome, showLoading } from './menu.js'
 import { createInput } from './input.js'
 import { createPlayer } from './player.js'
 import { createObstacles } from './obstacles.js'
+import { createGame } from './game.js'
 
 const canvas = document.querySelector('#game')
 const { scene, renderer, resize, setGround } = createScene(canvas)
@@ -18,22 +19,21 @@ const camera = rig.camera
 resize(window.innerWidth, window.innerHeight)
 
 const input = createInput()
-let player = null
-let obstacles = null
-let forest = null
-let speed = SPEED_START
+let game = null
 
 async function boot() {
   const [assets, foliage] = await Promise.all([loadAssets(), loadFoliage(FOLIAGE)])
   showLoading(false)
 
-  player = createPlayer(assets.dino.object, assets.dino.animations)
+  const player = createPlayer(assets.dino.object, assets.dino.animations)
   scene.add(player.object)
 
   const biome = BIOMES[await pickBiome()]
   setGround(biome.ground)
-  forest = createForest(scene, biome.kinds(foliage))
-  obstacles = createObstacles(scene, assets)
+  const forest = createForest(scene, biome.kinds(foliage))
+  const obstacles = createObstacles(scene, assets)
+
+  game = createGame({ player, obstacles, forest, rig, input })
 }
 
 boot()
@@ -49,10 +49,8 @@ timer.connect(document)
 function frame(timestamp) {
   timer.update(timestamp)
   const delta = Math.min(timer.getDelta(), MAX_DELTA)
+  if (game) game.update(delta)
   rig.update(delta)
-  if (player) player.update(delta, input)
-  if (forest) forest.update(delta, speed)
-  if (obstacles) obstacles.update(delta, speed, 0)
   renderer.render(scene, camera)
   input.consume()
   requestAnimationFrame(frame)

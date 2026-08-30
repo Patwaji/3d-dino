@@ -1,13 +1,7 @@
-import { CLUSTER_SPACING, DESPAWN_X, SPAWN_X, SPEED_START } from './config.js'
-import { nextGap, pickObstacle } from './spawn.js'
+import { DESPAWN_X, SPAWN_X, SPEED_START } from './config.js'
+import { SHAPES, clusterOffsets, nextGap, pickObstacle } from './spawn.js'
 
 const FIRST_X = 18
-
-const SHAPES = {
-  small: { visual: 0.55, width: 0.5, height: 1 },
-  large: { visual: 1.37, width: 0.9, height: 1.5 },
-  bird: { visual: 1, width: 0.9, height: 0.7 }
-}
 
 export function createObstacles(scene, assets) {
   const models = {
@@ -48,11 +42,8 @@ export function createObstacles(scene, assets) {
       return
     }
 
-    let x = startX
-    for (const size of choice.sizes) {
-      place(size, x, 0)
-      x += SHAPES[size].visual / 2 + CLUSTER_SPACING / 2
-    }
+    const offsets = clusterOffsets(choice.sizes)
+    choice.sizes.forEach((size, i) => place(size, startX + offsets[i], 0))
   }
 
   function prefill() {

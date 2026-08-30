@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { nextGap, pickObstacle } from '../src/spawn.js'
+import { SHAPES, clusterOffsets, clusterWidth, nextGap, pickObstacle } from '../src/spawn.js'
 import {
   BIRD_SCORE,
+  SPEED_START,
   FALL_GRAVITY,
   GAP_MAX_SECONDS,
   GAP_MIN_SECONDS,
@@ -37,6 +38,71 @@ describe('nextGap', () => {
   it('stays within the configured window', () => {
     expect(nextGap(10, () => 0)).toBeCloseTo(10 * GAP_MIN_SECONDS)
     expect(nextGap(10, () => 0.999999)).toBeCloseTo(10 * GAP_MAX_SECONDS)
+  })
+})
+
+const DINO_WIDTH = 0.9
+const FORGIVENESS = 0.85
+
+function jumpPeak() {
+  const peakVelocity = LAUNCH_VELOCITY + (JUMP_THRUST - GRAVITY) * THRUST_TIME
+  return (
+    LAUNCH_VELOCITY * THRUST_TIME +
+    0.5 * (JUMP_THRUST - GRAVITY) * THRUST_TIME * THRUST_TIME +
+    (peakVelocity * peakVelocity) / (2 * GRAVITY)
+  )
+}
+
+function secondsAbove(height) {
+  const peak = jumpPeak()
+  if (peak <= height) return 0
+  return 2 * Math.sqrt((2 * (peak - height)) / (GRAVITY * FALL_GRAVITY))
+}
+
+function secondsNeededOver(sizes, height, speed) {
+  const offsets = clusterOffsets(sizes)
+  const indices = sizes.map((size, i) => (SHAPES[size].height >= height ? i : -1)).filter((i) => i >= 0)
+  if (!indices.length) return 0
+  const first = indices[0]
+  const last = indices[indices.length - 1]
+  const span = offsets[last] - offsets[first]
+  const overlap = (DINO_WIDTH + SHAPES[sizes[first]].width) * FORGIVENESS
+  return (span + overlap) / speed
+}
+
+describe('cluster clearability', () => {
+  it('never puts more than one large cactus in a cluster', () => {
+    for (let i = 0; i < 2000; i += 1) {
+      const obstacle = pickObstacle(0, Math.random)
+      if (obstacle.kind !== 'cactus') continue
+      const larges = obstacle.sizes.filter((size) => size === 'large').length
+      expect(larges).toBeLessThanOrEqual(1)
+    }
+  })
+
+  it('generates only clusters a single jump can clear at starting speed', () => {
+    for (let i = 0; i < 2000; i += 1) {
+      const obstacle = pickObstacle(0, Math.random)
+      if (obstacle.kind !== 'cactus') continue
+      for (const height of [1, 1.5]) {
+        const needed = secondsNeededOver(obstacle.sizes, height, SPEED_START)
+        if (needed === 0) continue
+        expect(secondsAbove(height)).toBeGreaterThan(needed)
+      }
+    }
+  })
+
+  it('confirms two large cacti in one cluster would be unclearable', () => {
+    const needed = secondsNeededOver(['large', 'large'], 1.5, SPEED_START)
+    expect(secondsAbove(1.5)).toBeLessThan(needed)
+  })
+
+  it('stays within the width the spacing test assumes', () => {
+    for (let i = 0; i < 2000; i += 1) {
+      const obstacle = pickObstacle(0, Math.random)
+      if (obstacle.kind !== 'cactus') continue
+      expect(clusterWidth(obstacle.sizes)).toBeLessThanOrEqual(MAX_OBSTACLE_WIDTH)
+    }
   })
 })
 
