@@ -36,9 +36,13 @@ export function createScene(canvas) {
   ground.receiveShadow = true
   scene.add(ground)
 
+  function setGround(color) {
+    ground.material.color.set(color)
+  }
+
   function resize(width, height) {
     renderer.setSize(width, height)
   }
 
-  return { scene, renderer, sun, hemi, resize }
+  return { scene, renderer, sun, hemi, setGround, resize }
 }
