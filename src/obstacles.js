@@ -1,5 +1,7 @@
-import { CLUSTER_SPACING, DESPAWN_X, SPAWN_X } from './config.js'
+import { CLUSTER_SPACING, DESPAWN_X, SPAWN_X, SPEED_START } from './config.js'
 import { nextGap, pickObstacle } from './spawn.js'
+
+const FIRST_X = 18
 
 const SHAPES = {
   small: { visual: 0.55, width: 0.5, height: 1 },
@@ -16,7 +18,7 @@ export function createObstacles(scene, assets) {
 
   const pools = { small: [], large: [], bird: [] }
   const active = []
-  let distanceToNext = SPAWN_X
+  let distanceToNext = 0
 
   function take(size) {
     const pooled = pools[size].pop()
@@ -38,20 +40,28 @@ export function createObstacles(scene, assets) {
     return item
   }
 
-  function spawn(score) {
+  function spawn(score, startX) {
     const choice = pickObstacle(score, Math.random)
 
     if (choice.kind === 'bird' && models.bird) {
-      place('bird', SPAWN_X, choice.height)
+      place('bird', startX, choice.height)
       return
     }
 
-    let x = SPAWN_X
-    const sizes = choice.sizes || ['small']
-    for (const size of sizes) {
+    let x = startX
+    for (const size of choice.sizes) {
       place(size, x, 0)
       x += SHAPES[size].visual / 2 + CLUSTER_SPACING / 2
     }
+  }
+
+  function prefill() {
+    let x = FIRST_X
+    while (x < SPAWN_X) {
+      spawn(0, x)
+      x += nextGap(SPEED_START, Math.random)
+    }
+    distanceToNext = x - SPAWN_X
   }
 
   function update(delta, speed, score) {
@@ -59,7 +69,7 @@ export function createObstacles(scene, assets) {
     distanceToNext -= travelled
 
     if (distanceToNext <= 0) {
-      spawn(score)
+      spawn(score, SPAWN_X)
       distanceToNext = nextGap(speed, Math.random)
     }
 
@@ -92,8 +102,10 @@ export function createObstacles(scene, assets) {
       pools[item.size].push(item)
     }
     active.length = 0
-    distanceToNext = SPAWN_X
+    prefill()
   }
+
+  prefill()
 
   return { update, boxes, reset }
 }

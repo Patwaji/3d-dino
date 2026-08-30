@@ -29,11 +29,11 @@ async function boot() {
 
   player = createPlayer(assets.dino.object, assets.dino.animations)
   scene.add(player.object)
-  obstacles = createObstacles(scene, assets)
 
   const biome = BIOMES[await pickBiome()]
   setGround(biome.ground)
   forest = createForest(scene, biome.kinds(foliage))
+  obstacles = createObstacles(scene, assets)
 }
 
 boot()
