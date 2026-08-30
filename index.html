@@ -14,6 +14,22 @@
         color: #4a4636; background: #dfe6e2;
       }
       #menu[hidden], #loading[hidden] { display: none; }
+      #hud {
+        position: fixed; top: 20px; right: 26px; display: flex; gap: 20px;
+        font: 500 15px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .16em; color: #3f3b2e; pointer-events: none;
+      }
+      #hud[hidden] { display: none; }
+      #high { opacity: .42; }
+      #gameover {
+        position: fixed; inset: 0; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 14px;
+        pointer-events: none; color: #f2efe6; background: rgba(22, 26, 18, .46);
+        font: 600 26px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      #gameover[hidden] { display: none; }
+      #gameover .over { letter-spacing: .34em; margin: 0; }
+      #gameover .hint { font-size: 12px; letter-spacing: .22em; opacity: .5; margin: 0; }
       #menu-inner { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
       #menu-title, #loading p { letter-spacing: .34em; text-transform: uppercase; opacity: .5; margin: 0; }
       #menu-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -38,6 +54,14 @@
       </div>
     </div>
     <div id="loading"><p>loading</p></div>
+    <div id="hud" hidden>
+      <span id="high"></span>
+      <span id="score">00000</span>
+    </div>
+    <div id="gameover" hidden>
+      <p class="over">game over</p>
+      <p class="hint">press any key</p>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

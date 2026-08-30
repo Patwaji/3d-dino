@@ -10,6 +10,8 @@ import { createInput } from './input.js'
 import { createPlayer } from './player.js'
 import { createObstacles } from './obstacles.js'
 import { createGame } from './game.js'
+import { createScore } from './score.js'
+import { createUI } from './ui.js'
 
 const canvas = document.querySelector('#game')
 const { scene, renderer, resize, setGround } = createScene(canvas)
@@ -19,6 +21,8 @@ const camera = rig.camera
 resize(window.innerWidth, window.innerHeight)
 
 const input = createInput()
+const ui = createUI()
+const score = createScore(window.localStorage)
 let game = null
 
 async function boot() {
@@ -33,7 +37,9 @@ async function boot() {
   const forest = createForest(scene, biome.kinds(foliage))
   const obstacles = createObstacles(scene, assets)
 
-  game = createGame({ player, obstacles, forest, rig, input })
+  ui.show()
+  ui.setScore(0, score.high)
+  game = createGame({ player, obstacles, forest, rig, input, score, ui })
 }
 
 boot()

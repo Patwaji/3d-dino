@@ -1,7 +1,7 @@
 import { hitAny } from './collision.js'
 import { SPEED_ACCEL, SPEED_MAX, SPEED_START } from './config.js'
 
-export function createGame({ player, obstacles, forest, rig, input }) {
+export function createGame({ player, obstacles, forest, rig, input, score, ui }) {
   let state = 'playing'
   let speed = SPEED_START
   let distance = 0
@@ -13,6 +13,9 @@ export function createGame({ player, obstacles, forest, rig, input }) {
     player.reset()
     obstacles.reset()
     rig.reset()
+    score.reset()
+    ui.hideGameOver()
+    ui.setScore(0, score.high)
   }
 
   function update(delta) {
@@ -25,14 +28,18 @@ export function createGame({ player, obstacles, forest, rig, input }) {
     speed = Math.min(speed + SPEED_ACCEL * delta, SPEED_MAX)
     distance += speed * delta
 
+    score.add(speed * delta)
+    ui.setScore(score.value, score.high)
+
     forest.update(delta, speed)
-    obstacles.update(delta, speed, 0)
+    obstacles.update(delta, speed, score.value)
     player.update(delta, input)
 
     if (hitAny(player.getBox(), obstacles.boxes())) {
       state = 'gameover'
       player.die()
       rig.punchIn()
+      ui.showGameOver()
     }
   }
 
