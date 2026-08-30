@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { GAP_MIN_SECONDS, GRAVITY, JUMP_VELOCITY, SPEED_MAX, SPEED_START } from '../src/config.js'
+import { FALL_GRAVITY, GAP_MIN_SECONDS, GRAVITY, JUMP_THRUST, LAUNCH_VELOCITY, SPEED_MAX, SPEED_START, THRUST_TIME } from '../src/config.js'
 
 describe('config', () => {
   it('caps speed above the starting speed', () => {
@@ -7,7 +7,14 @@ describe('config', () => {
   })
 
   it('leaves room to land between obstacles at max speed', () => {
-    const airTime = (2 * JUMP_VELOCITY) / GRAVITY
-    expect(GAP_MIN_SECONDS).toBeGreaterThan(airTime)
+    const peakVelocity = LAUNCH_VELOCITY + (JUMP_THRUST - GRAVITY) * THRUST_TIME
+    const riseTime = THRUST_TIME + peakVelocity / GRAVITY
+    const peak = peakVelocity * peakVelocity / (2 * GRAVITY) + LAUNCH_VELOCITY * THRUST_TIME
+    const fallTime = Math.sqrt((2 * peak) / (GRAVITY * FALL_GRAVITY))
+    expect(GAP_MIN_SECONDS).toBeGreaterThan(riseTime + fallTime)
+  })
+
+  it('thrust outlasts a single frame so the launch ramps', () => {
+    expect(THRUST_TIME).toBeGreaterThan(0.05)
   })
 })

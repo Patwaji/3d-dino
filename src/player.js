@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { cloneModel, findClip } from './assets.js'
-import { FALL_GRAVITY, FAST_FALL, GRAVITY, JUMP_VELOCITY, RELEASE_GRAVITY } from './config.js'
+import { FALL_GRAVITY, FAST_FALL, GRAVITY, JUMP_THRUST, LAUNCH_VELOCITY, THRUST_TIME } from './config.js'
 
 const RUN_BOX = { width: 0.9, height: 1.6 }
 const DUCK_BOX = { width: 1.3, height: 0.9 }
@@ -16,7 +16,8 @@ export function createPlayer(model, animations) {
   const jump = mixer.clipAction(findClip(animations, 'TRex_Jump'))
   const death = mixer.clipAction(findClip(animations, 'TRex_Death'))
 
-  const airTime = (2 * JUMP_VELOCITY) / GRAVITY
+  const peakVelocity = LAUNCH_VELOCITY + (JUMP_THRUST - GRAVITY) * THRUST_TIME
+  const airTime = THRUST_TIME + (peakVelocity / GRAVITY) * (1 + 1 / FALL_GRAVITY)
   jump.setLoop(THREE.LoopOnce)
   jump.clampWhenFinished = true
   jump.timeScale = jump.getClip().duration / airTime
@@ -26,6 +27,7 @@ export function createPlayer(model, animations) {
 
   let current = run
   let velocityY = 0
+  let thrustLeft = 0
   let state = 'running'
 
   run.play()
@@ -47,23 +49,30 @@ export function createPlayer(model, animations) {
     }
 
     if (state !== 'jumping' && input.jumpPressed) {
-      velocityY = JUMP_VELOCITY
+      velocityY = LAUNCH_VELOCITY
+      thrustLeft = THRUST_TIME
       state = 'jumping'
       object.scale.y = 1
       play(jump)
     }
 
     if (state === 'jumping') {
-      let gravity = GRAVITY
-      if (velocityY > 0 && !input.jumpHeld) gravity *= RELEASE_GRAVITY
-      if (velocityY <= 0) gravity *= FALL_GRAVITY
-      velocityY -= gravity * delta
+      if (thrustLeft > 0 && input.jumpHeld) {
+        const thrust = Math.min(delta, thrustLeft)
+        velocityY += JUMP_THRUST * thrust
+        thrustLeft -= thrust
+      } else {
+        thrustLeft = 0
+      }
+
+      velocityY -= GRAVITY * (velocityY <= 0 ? FALL_GRAVITY : 1) * delta
       if (input.duckHeld) velocityY -= FAST_FALL * delta
       object.position.y += velocityY * delta
 
       if (object.position.y <= 0) {
         object.position.y = 0
         velocityY = 0
+        thrustLeft = 0
         state = 'running'
         play(run)
       }
@@ -88,6 +97,7 @@ export function createPlayer(model, animations) {
   function die() {
     state = 'dead'
     velocityY = 0
+    thrustLeft = 0
     object.scale.y = 1
     play(death)
   }
@@ -95,6 +105,7 @@ export function createPlayer(model, animations) {
   function reset() {
     state = 'running'
     velocityY = 0
+    thrustLeft = 0
     object.position.y = 0
     object.scale.y = 1
     play(run)
