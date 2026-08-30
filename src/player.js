@@ -5,7 +5,7 @@ import { FALL_GRAVITY, FAST_FALL, GRAVITY, JUMP_VELOCITY, RELEASE_GRAVITY } from
 const RUN_BOX = { width: 0.9, height: 1.6 }
 const DUCK_BOX = { width: 1.3, height: 0.9 }
 const DUCK_SQUASH = 0.55
-const FADE = 0.15
+const FADE = 0.25
 
 export function createPlayer(model, animations) {
   const object = cloneModel(model)
