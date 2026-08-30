@@ -30,8 +30,8 @@ export function nextGap(speed, random) {
   return speed * (GAP_MIN_SECONDS + random() * (GAP_MAX_SECONDS - GAP_MIN_SECONDS))
 }
 
-export function pickObstacle(score, random) {
-  if (score >= BIRD_SCORE && random() < BIRD_CHANCE) {
+export function pickObstacle(score, random, allowBirds = true) {
+  if (allowBirds && score >= BIRD_SCORE && random() < BIRD_CHANCE) {
     return { kind: 'bird', count: 1, height: BIRD_HEIGHTS[Math.floor(random() * BIRD_HEIGHTS.length)] }
   }
 

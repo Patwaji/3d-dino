@@ -35,9 +35,9 @@ export function createObstacles(scene, assets) {
   }
 
   function spawn(score, startX) {
-    const choice = pickObstacle(score, Math.random)
+    const choice = pickObstacle(score, Math.random, Boolean(models.bird))
 
-    if (choice.kind === 'bird' && models.bird) {
+    if (choice.kind === 'bird') {
       place('bird', startX, choice.height)
       return
     }
