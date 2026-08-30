@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { MAX_DELTA } from './config.js'
+import { MAX_DELTA, SPEED_START } from './config.js'
 import { createCameraRig } from './camera.js'
 import { createScene } from './scene.js'
 import { loadAssets, loadFoliage } from './assets.js'
@@ -19,6 +19,7 @@ resize(window.innerWidth, window.innerHeight)
 const input = createInput()
 let player = null
 let forest = null
+let speed = SPEED_START
 
 async function boot() {
   const [assets, foliage] = await Promise.all([loadAssets(), loadFoliage(FOLIAGE)])
@@ -47,7 +48,7 @@ function frame(timestamp) {
   const delta = Math.min(timer.getDelta(), MAX_DELTA)
   rig.update(delta)
   if (player) player.update(delta, input)
-  if (forest) forest.update(delta, 6)
+  if (forest) forest.update(delta, speed)
   renderer.render(scene, camera)
   input.consume()
   requestAnimationFrame(frame)
