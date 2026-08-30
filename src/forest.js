@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 const TILE = 130
 const START_X = -30
+const UP = new THREE.Vector3(0, 1, 0)
 
 function collectParts(model) {
   const parts = []
@@ -17,6 +18,19 @@ function collectParts(model) {
   return parts
 }
 
+function addInstances(tile, parts, matrices, combined) {
+  for (const part of parts) {
+    const mesh = new THREE.InstancedMesh(part.geometry, part.material, matrices.length)
+    mesh.frustumCulled = false
+    for (let i = 0; i < matrices.length; i += 1) {
+      combined.multiplyMatrices(matrices[i], part.matrix)
+      mesh.setMatrixAt(i, combined)
+    }
+    mesh.instanceMatrix.needsUpdate = true
+    tile.add(mesh)
+  }
+}
+
 function buildTile(kinds) {
   const tile = new THREE.Group()
   const transform = new THREE.Matrix4()
@@ -29,6 +43,8 @@ function buildTile(kinds) {
     const parts = collectParts(kind.model)
     const placements = []
 
+    const crowns = []
+
     for (let i = 0; i < kind.count; i += 1) {
       const size = kind.scale[0] + Math.random() * (kind.scale[1] - kind.scale[0])
       position.set(
@@ -36,21 +52,24 @@ function buildTile(kinds) {
         0,
         kind.depth[0] + Math.random() * (kind.depth[1] - kind.depth[0])
       )
-      quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.random() * Math.PI * 2)
+      quaternion.setFromAxisAngle(UP, Math.random() * Math.PI * 2)
       scale.setScalar(size)
       placements.push(new THREE.Matrix4().compose(position, quaternion, scale))
+
+      if (kind.crown) {
+        position.y = kind.crown.height * size
+        quaternion.setFromAxisAngle(UP, Math.random() * Math.PI * 2)
+        scale.set(
+          size * kind.crown.scale[0],
+          size * kind.crown.scale[1],
+          size * kind.crown.scale[2]
+        )
+        crowns.push(new THREE.Matrix4().compose(position, quaternion, scale))
+      }
     }
 
-    for (const part of parts) {
-      const mesh = new THREE.InstancedMesh(part.geometry, part.material, kind.count)
-      mesh.frustumCulled = false
-      for (let i = 0; i < kind.count; i += 1) {
-        combined.multiplyMatrices(placements[i], part.matrix)
-        mesh.setMatrixAt(i, combined)
-      }
-      mesh.instanceMatrix.needsUpdate = true
-      tile.add(mesh)
-    }
+    addInstances(tile, parts, placements, combined)
+    if (kind.crown) addInstances(tile, collectParts(kind.crown.model), crowns, combined)
   }
 
   return tile

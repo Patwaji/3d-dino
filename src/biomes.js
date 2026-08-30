@@ -13,13 +13,25 @@ export const BIOMES = {
   },
   bamboo: {
     label: 'Bamboo',
-    hint: 'dense grove, mushrooms',
+    hint: 'leafy grove, mushrooms',
     ground: '#77804f',
     kinds: (f) => [
-      { model: f.Bamboo_4, count: 780, scale: [0.7, 1.8], depth: [-5, -34] },
+      { model: f.Bamboo_4, count: 780, scale: [0.7, 1.8], depth: [-5, -34], crown: { model: f.Grass_4, height: 1.75, scale: [2.6, 1.1, 2.6] } },
       { model: f.Grass_4, count: 390, scale: [0.6, 1.4], depth: [-4, -18] },
       { model: f.Mushroom_4, count: 165, scale: [0.7, 1.8], depth: [-4, -16] },
       { model: f.BushBerries_4, count: 90, scale: [0.6, 1.2], depth: [-6, -20] }
+    ]
+  },
+  jungle: {
+    label: 'Jungle',
+    hint: 'palm canopy over bamboo',
+    ground: '#6f7c4c',
+    kinds: (f) => [
+      { model: f.PalmTree_4, count: 240, scale: [0.9, 1.9], depth: [-6, -34] },
+      { model: f.Bamboo_4, count: 420, scale: [0.6, 1.3], depth: [-5, -26], crown: { model: f.Grass_4, height: 1.75, scale: [2.2, 1.0, 2.2] } },
+      { model: f.BushBerries_4, count: 210, scale: [0.7, 1.5], depth: [-5, -22] },
+      { model: f.Grass_4, count: 300, scale: [0.7, 1.5], depth: [-4, -18] },
+      { model: f.Mushroom_4, count: 90, scale: [0.7, 1.6], depth: [-4, -14] }
     ]
   },
   jurassic: {
