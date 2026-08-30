@@ -9,8 +9,14 @@ export function createUI() {
     highEl.textContent = high > 0 ? `hi ${String(high).padStart(5, '0')}` : ''
   }
 
+  function setNight(isNight) {
+    if (isNight) document.body.dataset.night = ''
+    else delete document.body.dataset.night
+  }
+
   return {
     setScore,
+    setNight,
     show: () => { hud.hidden = false },
     showGameOver: () => { gameOverEl.hidden = false },
     hideGameOver: () => { gameOverEl.hidden = true }

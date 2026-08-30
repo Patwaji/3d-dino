@@ -1,7 +1,8 @@
 import { hitAny } from './collision.js'
+import { isNight } from './score.js'
 import { SPEED_ACCEL, SPEED_MAX, SPEED_START } from './config.js'
 
-export function createGame({ player, obstacles, forest, rig, input, score, ui }) {
+export function createGame({ player, obstacles, forest, rig, input, score, ui, sky }) {
   let state = 'playing'
   let speed = SPEED_START
   let distance = 0
@@ -14,6 +15,8 @@ export function createGame({ player, obstacles, forest, rig, input, score, ui })
     obstacles.reset()
     rig.reset()
     score.reset()
+    sky.setNight(false)
+    ui.setNight(false)
     ui.hideGameOver()
     ui.setScore(0, score.high)
   }
@@ -30,6 +33,9 @@ export function createGame({ player, obstacles, forest, rig, input, score, ui })
 
     score.add(speed * delta)
     ui.setScore(score.value, score.high)
+    const night = isNight(score.value)
+    sky.setNight(night)
+    ui.setNight(night)
 
     forest.update(delta, speed)
     obstacles.update(delta, speed, score.value)

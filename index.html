@@ -18,7 +18,9 @@
         position: fixed; top: 20px; right: 26px; display: flex; gap: 20px;
         font: 500 15px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
         letter-spacing: .16em; color: #3f3b2e; pointer-events: none;
+        transition: color .8s ease;
       }
+      body[data-night] #hud { color: #dfe3d4; }
       #hud[hidden] { display: none; }
       #high { opacity: .42; }
       #gameover {

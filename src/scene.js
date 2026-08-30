@@ -1,5 +1,23 @@
 import * as THREE from 'three'
 
+const DAY = {
+  sky: new THREE.Color('#dfe6e2'),
+  sun: new THREE.Color('#fff4e0'),
+  sunIntensity: 1.7,
+  hemiSky: new THREE.Color('#ffffff'),
+  hemiGround: new THREE.Color('#8d8163'),
+  hemiIntensity: 0.9
+}
+
+const NIGHT = {
+  sky: new THREE.Color('#333b30'),
+  sun: new THREE.Color('#c8d2bd'),
+  sunIntensity: 0.55,
+  hemiSky: new THREE.Color('#9fb0a4'),
+  hemiGround: new THREE.Color('#2a2b22'),
+  hemiIntensity: 0.34
+}
+
 export function createScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -36,6 +54,27 @@ export function createScene(canvas) {
   ground.receiveShadow = true
   scene.add(ground)
 
+  let blend = 0
+  let target = 0
+
+  function setNight(isNight) {
+    target = isNight ? 1 : 0
+  }
+
+  function updateSky(delta) {
+    if (blend === target) return
+    blend += (target - blend) * (1 - Math.pow(0.08, delta))
+    if (Math.abs(target - blend) < 0.002) blend = target
+
+    scene.background.lerpColors(DAY.sky, NIGHT.sky, blend)
+    scene.fog.color.copy(scene.background)
+    sun.color.lerpColors(DAY.sun, NIGHT.sun, blend)
+    sun.intensity = DAY.sunIntensity + (NIGHT.sunIntensity - DAY.sunIntensity) * blend
+    hemi.color.lerpColors(DAY.hemiSky, NIGHT.hemiSky, blend)
+    hemi.groundColor.lerpColors(DAY.hemiGround, NIGHT.hemiGround, blend)
+    hemi.intensity = DAY.hemiIntensity + (NIGHT.hemiIntensity - DAY.hemiIntensity) * blend
+  }
+
   function setGround(color) {
     ground.material.color.set(color)
   }
@@ -44,5 +83,5 @@ export function createScene(canvas) {
     renderer.setSize(width, height)
   }
 
-  return { scene, renderer, sun, hemi, setGround, resize }
+  return { scene, renderer, sun, hemi, setGround, setNight, updateSky, resize }
 }

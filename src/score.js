@@ -1,4 +1,8 @@
-import { SCORE_PER_UNIT } from './config.js'
+import { NIGHT_INTERVAL, SCORE_PER_UNIT } from './config.js'
+
+export function isNight(score) {
+  return Math.floor(score / NIGHT_INTERVAL) % 2 === 1
+}
 
 const KEY = 'dino-high-score'
 

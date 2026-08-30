@@ -14,7 +14,7 @@ import { createScore } from './score.js'
 import { createUI } from './ui.js'
 
 const canvas = document.querySelector('#game')
-const { scene, renderer, resize, setGround } = createScene(canvas)
+const { scene, renderer, resize, setGround, setNight, updateSky } = createScene(canvas)
 
 const rig = createCameraRig(window.innerWidth, window.innerHeight)
 const camera = rig.camera
@@ -39,7 +39,7 @@ async function boot() {
 
   ui.show()
   ui.setScore(0, score.high)
-  game = createGame({ player, obstacles, forest, rig, input, score, ui })
+  game = createGame({ player, obstacles, forest, rig, input, score, ui, sky: { setNight } })
 }
 
 boot()
@@ -56,6 +56,7 @@ function frame(timestamp) {
   timer.update(timestamp)
   const delta = Math.min(timer.getDelta(), MAX_DELTA)
   if (game) game.update(delta)
+  updateSky(delta)
   rig.update(delta)
   renderer.render(scene, camera)
   input.consume()

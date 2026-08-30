@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createScore } from '../src/score.js'
-import { SCORE_PER_UNIT } from '../src/config.js'
+import { createScore, isNight } from '../src/score.js'
+import { NIGHT_INTERVAL, SCORE_PER_UNIT } from '../src/config.js'
 
 function fakeStorage() {
   const data = new Map()
@@ -14,6 +14,27 @@ const hostileStorage = {
   getItem: () => { throw new Error('blocked') },
   setItem: () => { throw new Error('blocked') }
 }
+
+describe('isNight', () => {
+  it('starts in daylight', () => {
+    expect(isNight(0)).toBe(false)
+    expect(isNight(NIGHT_INTERVAL - 1)).toBe(false)
+  })
+
+  it('turns to night at the first interval', () => {
+    expect(isNight(NIGHT_INTERVAL)).toBe(true)
+    expect(isNight(NIGHT_INTERVAL * 2 - 1)).toBe(true)
+  })
+
+  it('returns to day at the second interval', () => {
+    expect(isNight(NIGHT_INTERVAL * 2)).toBe(false)
+  })
+
+  it('keeps alternating', () => {
+    expect(isNight(NIGHT_INTERVAL * 3)).toBe(true)
+    expect(isNight(NIGHT_INTERVAL * 4)).toBe(false)
+  })
+})
 
 describe('createScore', () => {
   let score
