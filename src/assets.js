@@ -5,7 +5,7 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js'
 import { CACTUS_LARGE_HEIGHT, CACTUS_SMALL_HEIGHT, DINO_HEIGHT } from './config.js'
 
-const CACTUS_COLOR = '#5d7f4a'
+const CACTUS_COLOR = '#2b4630'
 
 function normalize(object, targetHeight) {
   const box = new THREE.Box3().setFromObject(object)

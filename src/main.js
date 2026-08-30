@@ -8,6 +8,7 @@ import { BIOMES, FOLIAGE } from './biomes.js'
 import { pickBiome, showLoading } from './menu.js'
 import { createInput } from './input.js'
 import { createPlayer } from './player.js'
+import { createObstacles } from './obstacles.js'
 
 const canvas = document.querySelector('#game')
 const { scene, renderer, resize, setGround } = createScene(canvas)
@@ -18,6 +19,7 @@ resize(window.innerWidth, window.innerHeight)
 
 const input = createInput()
 let player = null
+let obstacles = null
 let forest = null
 let speed = SPEED_START
 
@@ -27,6 +29,7 @@ async function boot() {
 
   player = createPlayer(assets.dino.object, assets.dino.animations)
   scene.add(player.object)
+  obstacles = createObstacles(scene, assets)
 
   const biome = BIOMES[await pickBiome()]
   setGround(biome.ground)
@@ -49,6 +52,7 @@ function frame(timestamp) {
   rig.update(delta)
   if (player) player.update(delta, input)
   if (forest) forest.update(delta, speed)
+  if (obstacles) obstacles.update(delta, speed, 0)
   renderer.render(scene, camera)
   input.consume()
   requestAnimationFrame(frame)
