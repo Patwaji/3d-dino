@@ -15,3 +15,6 @@ export const BIRD_SCORE = 450
 export const NIGHT_INTERVAL = 700
 export const SEGMENT_LENGTH = 20
 export const SEGMENT_COUNT = 5
+export const DINO_HEIGHT = 1.6
+export const CACTUS_SMALL_HEIGHT = 1.0
+export const CACTUS_LARGE_HEIGHT = 1.5
